@@ -48,8 +48,42 @@ class Login extends BaseController
             session()->setFlashdata($sessError);
             return redirect()->to(site_url('/'));
         } else {
-            $data = $this->LoginModel->getLogin($email);
-            dd($data);
+            $cekUserLogin = $this->LoginModel->getLogin($email);
+            if ($cekUserLogin == null) {
+                $sessError = [
+                    'errEmail' => 'Email tidak terdaftar',
+                ];
+    
+                session()->setFlashdata($sessError);
+                return redirect()->to(site_url('/'));
+            } else {
+                $passUser = $cekUserLogin['password'];
+                // if (password_verify($password, $passUser)) {
+                //     dd("pass cocok");
+                // } else {
+                //     $sessError = [
+                //         'errPassword' => 'Password salah',
+                //     ];
+        
+                //     session()->setFlashdata($sessError);
+                //     return redirect()->to(site_url('/'));
+                // }
+                if ($password == $passUser) {
+                    session()->set($cekUserLogin);
+                    return redirect()->to('/home');
+                } else {
+                    $sessError = [
+                        'errPassword' => 'Password salah',
+                    ];
+        
+                    session()->setFlashdata($sessError);
+                    return redirect()->to(site_url('/'));
+                }
+            }
         }
+    }
+    public function logout(){
+        session()->destroy();
+        return redirect('/');
     }
 }
